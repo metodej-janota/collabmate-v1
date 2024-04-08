@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { ArrowRight, SquarePlus } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
+import Link from "next/link";
 import { Button } from "../ui/button";
 
 export const Hero = () => {
@@ -15,11 +16,15 @@ export const Hero = () => {
           expects a response.
         </p>
         <div className="flex gap-4 mt-6">
-          <Button>
-            Přihlásit se <ArrowRight className="ml-2 h-4 w-4" />
+          <Button className="flex">
+            <Link href="/login" className="flex items-center">
+              Přihlásit se <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
           </Button>
-          <Button variant="outline" size="icon">
-            <SquarePlus />
+          <Button variant="outline">
+            <Link href="/register" className="flex items-center">
+              Registrovat <Plus className="ml-2 h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </div>
