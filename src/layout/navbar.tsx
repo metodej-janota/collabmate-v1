@@ -12,19 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Activity,
-  ArrowUpRight,
-  CircleUser,
-  CreditCard,
-  DollarSign,
-  Menu,
-  Package2,
-  Search,
-  Users,
-} from "lucide-react";
+import { CircleUser, Menu, Package2, Search } from "lucide-react";
 import Link from "next/link";
-import ThemeSwitch from "../components/util/themeSwitch";
 
 export function Navbar() {
   const { setTheme } = useTheme();
