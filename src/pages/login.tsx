@@ -1,5 +1,5 @@
 import { Button } from "../components/ui/button";
-import { githubLogIn } from "../supabase/lib/authLogic";
+import { githubLogIn, isUserLoggedIn } from "../supabase/lib/authLogic";
 
 export default function Login() {
   return (

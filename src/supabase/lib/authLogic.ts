@@ -1,6 +1,38 @@
-import { use, useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
+// Register with email
+
+const registerWithEmail = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: password,
+  });
+
+  if (error) {
+    console.error("Email registration error:", error.message);
+    return error;
+  }
+
+  return data;
+};
+
+// Login with email
+
+const logInWithEmail = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
+
+  if (error) {
+    console.error("Email login error:", error.message);
+    return error;
+  }
+
+  return data;
+};
+
+// GitHub login
 const githubLogIn = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "github",
@@ -17,26 +49,48 @@ const githubLogIn = async () => {
   if (error) console.error("GitHub login error:", error.message);
 };
 
+// Auth logout
 const logOut = async () => {
   const { error } = await supabase.auth.signOut();
 
   if (!error) {
-    console.log("GitHub logout successful");
+    location.reload();
   }
 
-  if (error) console.error("GitHub logout error:", error.message);
+  if (error) console.error("error:", error.message);
 };
 
+// user session info
 const getUseSessionInfo = async () => {
-  const userData = [];
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  userData.push(user);
+  const userData = user;
 
   return userData;
 };
 
-export { getUseSessionInfo, githubLogIn, logOut };
+//
+
+const isUserLoggedIn = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const userData = user;
+
+  if (userData?.email == null || userData.email == undefined) {
+    return false as boolean;
+  } else {
+    return true as boolean;
+  }
+};
+
+export {
+  getUseSessionInfo,
+  githubLogIn,
+  isUserLoggedIn,
+  logInWithEmail,
+  logOut,
+};

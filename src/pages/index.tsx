@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import { getUseSessionInfo } from "../supabase/lib/authLogic";
@@ -5,7 +6,7 @@ import { supabase } from "../supabase/supabase";
 
 export default function Home() {
   const [data, setData] = useState<any[]>([]);
-  const [user, setUser] = useState<any[]>([]);
+  const [user, setUser] = useState({} as any);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,7 +19,7 @@ export default function Home() {
 
         const userData = await getUseSessionInfo();
         setUser(userData);
-        console.log(userData[0]);
+        console.log(userData);
 
         setData(data || []);
       } catch (error) {
@@ -65,12 +66,17 @@ export default function Home() {
         <br />
         <br />
         <p>user info</p>
-        {user.map((item, index) => (
-          <div key={index}>
-            <p>{item.email}</p>
-            <p>{item.id}</p>
-          </div>
-        ))}
+        <p>{user?.email}</p>
+        <p>{user?.id}</p>
+        <p>{user?.aud}</p>
+        <p>{user?.app_metadata?.provider}</p>
+        <p>{user?.user_metadata?.full_name}</p>
+        <Image
+          src={user?.user_metadata?.avatar_url}
+          alt="avatar"
+          width={100}
+          height={100}
+        />
       </div>
     </>
   );
