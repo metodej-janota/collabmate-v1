@@ -30,14 +30,6 @@ export default function Home() {
     fetchData();
   }, []);
 
-  supabase.auth.onAuthStateChange((_, session) => {
-    if (session) {
-      console.log("GitHub login successful");
-    } else {
-      console.log("logged out");
-    }
-  });
-
   return (
     <>
       <div className="h-screen flex flex-col">
@@ -49,10 +41,6 @@ export default function Home() {
             A modal dialog that interrupts the user with important content and
             expects a response.
           </p>
-          <div className="flex gap-4 mt-6">
-            <Button className="w-[100%]">Sign in</Button>
-            <Button className="w-[100%]">Sign up</Button>
-          </div>
         </div>
       </div>
       <ul>

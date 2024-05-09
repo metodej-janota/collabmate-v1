@@ -1,21 +1,5 @@
 import { supabase } from "../supabase";
 
-// Register with email
-
-const registerWithEmail = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signUp({
-    email: email,
-    password: password,
-  });
-
-  if (error) {
-    console.error("Email registration error:", error.message);
-    return error;
-  }
-
-  return data;
-};
-
 // Login with email
 
 const logInWithEmail = async (email: string, password: string) => {
@@ -71,26 +55,4 @@ const getUseSessionInfo = async () => {
   return userData;
 };
 
-//
-
-const isUserLoggedIn = async () => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const userData = user;
-
-  if (userData?.email == null || userData.email == undefined) {
-    return false as boolean;
-  } else {
-    return true as boolean;
-  }
-};
-
-export {
-  getUseSessionInfo,
-  githubLogIn,
-  isUserLoggedIn,
-  logInWithEmail,
-  logOut,
-};
+export { getUseSessionInfo, githubLogIn, logInWithEmail, logOut };
