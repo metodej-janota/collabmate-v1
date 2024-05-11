@@ -10,12 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { githubLogIn } from "@/supabase/lib/authLogic";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import ErrorComponent from "../components/util/errorComponent";
 import { supabase } from "../supabase/supabase";
 
 export default function Register() {
+  const router = useRouter();
   const [logined, setLogined] = useState(false);
+
   supabase.auth.onAuthStateChange((_, session) => {
     if (session == undefined) {
       setLogined(false);
@@ -51,6 +54,8 @@ export default function Register() {
     if (error) {
       setError(error.message);
       return error.message;
+    } else {
+      router.replace("/login");
     }
   };
 

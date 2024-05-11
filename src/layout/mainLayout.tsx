@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster";
 import { Navbar } from "./navbar";
 
 export default function MainLayout({
@@ -9,6 +10,7 @@ export default function MainLayout({
     <>
       <Navbar />
       <main>{children}</main>
+      <Toaster />
     </>
   );
 }
