@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   changeUserDisplayName,
   changeUserEmail,
+  getUserAvatar,
+  uploadAvatar,
 } from "../../../supabase/lib/userLogic";
 import withAuth from "../../../supabase/protectedRoutes";
 import { supabase } from "../../../supabase/supabase";
@@ -21,9 +24,11 @@ import { supabase } from "../../../supabase/supabase";
 function Settings() {
   const { toast } = useToast();
 
+  const [userId, setUserId] = useState("");
   const [provider, setProvider] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
+  const [avatar, setAvatar] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +36,8 @@ function Settings() {
       setProvider(session.data.session?.user.app_metadata?.provider || "");
       setDisplayName(session.data.session?.user.user_metadata.full_name || "");
       setEmail(session.data.session?.user.email || "");
+      setUserId(session.data.session?.user.id || "");
+      setAvatar(await getUserAvatar(session.data.session?.user.id || ""));
     };
 
     fetchData();
@@ -55,6 +62,50 @@ function Settings() {
                   You signed up with GitHub. You cant change your informations.
                 </p>
               )}
+              <Card x-chunk="dashboard-04-chunk-2">
+                <CardHeader>
+                  <CardTitle>Profile avatar</CardTitle>
+                  <CardDescription>
+                    The picture that will be displayed on your store.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex gap-4">
+                  <div className="flex w-full">
+                    <Image
+                      className="rounded-full w-40 h-40 object-cover"
+                      src={
+                        avatar ||
+                        "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg"
+                      }
+                      width={200}
+                      height={200}
+                      alt="avatar"
+                      priority={true}
+                      fetchPriority="high"
+                      loader={({ src }) => src}
+                      loading="eager"
+                      unoptimized
+                    />
+                    <form className="w-full">
+                      <Input
+                        placeholder="Email"
+                        disabled={provider === "github"}
+                        type="file"
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            const file = e.target.files[0];
+                            uploadAvatar(userId, file);
+                            setAvatar(URL.createObjectURL(file));
+                          }
+                        }}
+                      />
+                    </form>
+                  </div>
+                </CardContent>
+                <CardFooter className="border-t px-6 py-4">
+                  <Button disabled={provider === "github"}>Save</Button>
+                </CardFooter>
+              </Card>
               <Card x-chunk="dashboard-04-chunk-1">
                 <CardHeader>
                   <CardTitle>Display name</CardTitle>
