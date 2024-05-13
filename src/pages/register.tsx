@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import ErrorComponent from "../components/util/errorComponent";
+import { registerWithEmail } from "../supabase/lib/authLogic";
 import { supabase } from "../supabase/supabase";
 
 export default function Register() {
@@ -33,31 +34,14 @@ export default function Register() {
   const [password, setPassword] = useState("");
 
   function handleRegister() {
-    registerWithEmail(name, email, password);
-  }
-
-  const registerWithEmail = async (
-    name: string,
-    email: string,
-    password: string
-  ) => {
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          name: name,
-        },
-      },
+    registerWithEmail(name, email, password).then((res) => {
+      if (res) {
+        setError(res);
+      } else {
+        router.push("/login");
+      }
     });
-
-    if (error) {
-      setError(error.message);
-      return error.message;
-    } else {
-      router.replace("/login");
-    }
-  };
+  }
 
   return (
     <>

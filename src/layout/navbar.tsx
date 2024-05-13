@@ -9,19 +9,38 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { CircleUser, Menu, Moon, Package2, Search, Sun } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  CircleUser,
+  Home,
+  LayoutDashboard,
+  LineChart,
+  Menu,
+  Moon,
+  Package,
+  Package2,
+  Search,
+  Settings,
+  Sun,
+  Users2,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import { logOut } from "../supabase/lib/authLogic";
-
-import { log } from "console";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { getUseSessionInfo } from "../supabase/lib/authLogic";
 import { supabase } from "../supabase/supabase";
 
 export function Navbar() {
   const { setTheme } = useTheme();
+  const router = useRouter();
+
+  const [activePage, setActivePage] = useState(router.pathname.split("/")[1]);
 
   const [logined, setLogined] = useState(false);
   supabase.auth.onAuthStateChange((_, session) => {
@@ -37,6 +56,90 @@ export function Navbar() {
       {logined ? (
         <div className="flex fixed w-full flex-col">
           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+            {logined ? (
+              <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
+                <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="/dashboard/dashboard"
+                          className={`${
+                            router.pathname === "/dashboard/dashboard"
+                              ? "group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
+                              : "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                          }`}
+                        >
+                          <LayoutDashboard
+                            className={`${
+                              router.pathname === "/dashboard/dashboard"
+                                ? "h-4 w-4 transition-all group-hover:scale-110"
+                                : "h-5 w-5"
+                            }`}
+                          />
+                          <span className="sr-only">Dashboard</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Dashboard</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="/dashboard/user/settings"
+                          className={`${
+                            router.pathname === "/dashboard/user/settings"
+                              ? "group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
+                              : "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                          }`}
+                        >
+                          <Settings
+                            className={`${
+                              router.pathname === "/dashboard/user/settings"
+                                ? "h-4 w-4 transition-all group-hover:scale-110"
+                                : "h-5 w-5"
+                            }`}
+                          />
+                          <span className="sr-only">Settings</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Settings</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="#"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                        >
+                          <Users2 className="h-5 w-5" />
+                          <span className="sr-only">Customers</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Customers</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </nav>
+                <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="#"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                        >
+                          <Settings className="h-5 w-5" />
+                          <span className="sr-only">Settings</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Settings</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </nav>
+              </aside>
+            ) : null}
             <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
               <Link
                 href="#"
@@ -47,33 +150,9 @@ export function Navbar() {
               </Link>
               <Link
                 href="#"
-                className="text-foreground transition-colors hover:text-foreground"
+                className="text-foreground transition-colors hover:text-foreground text-lg font-semibold md:text-base"
               >
-                Dashboard
-              </Link>
-              <Link
-                href="#"
-                className="text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Orders
-              </Link>
-              <Link
-                href="#"
-                className="text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Products
-              </Link>
-              <Link
-                href="#"
-                className="text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Customers
-              </Link>
-              <Link
-                href="#"
-                className="text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Analytics
+                CollabMate
               </Link>
             </nav>
             <Sheet>
@@ -175,8 +254,9 @@ export function Navbar() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                  <DropdownMenuItem>Support</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/dashboard/user/settings">Settings</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logOut}>Logout</DropdownMenuItem>
                 </DropdownMenuContent>

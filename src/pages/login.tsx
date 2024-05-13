@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { log } from "console";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { Button } from "../components/ui/button";
 import {
@@ -16,6 +16,7 @@ import { githubLogIn, logInWithEmail } from "../supabase/lib/authLogic";
 import { supabase } from "../supabase/supabase";
 
 export default function Login() {
+  const router = useRouter();
   const [logined, setLogined] = useState(false);
 
   const [error, setError] = useState("");
@@ -31,22 +32,14 @@ export default function Login() {
   });
 
   function handleLogin() {
-    handleLogInWithEmail(email, password);
-  }
-
-  const handleLogInWithEmail = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
+    logInWithEmail(email, password).then((res) => {
+      if (res) {
+        setError(res);
+      } else {
+        router.push("/dashboard/dashboard");
+      }
     });
-
-    if (error) {
-      setError(error.message);
-      return error.message;
-    } else {
-      location.reload();
-    }
-  };
+  }
 
   return (
     <>

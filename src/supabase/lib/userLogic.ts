@@ -6,7 +6,7 @@ const changeUserDisplayName = async (name: string) => {
   });
 
   if (error) {
-    console.error("Error updating user:", error.message);
+    console.error(error.message);
     return error;
   }
 };
@@ -17,20 +17,26 @@ const changeUserEmail = async (email: string) => {
   });
 
   if (error) {
-    console.error("Error updating user:", error.message);
+    console.error(error.message);
     return error;
   }
 };
 
 const checkFileExists = async (userId: string) => {
-  const { data, error } = await supabase.storage
-    .from("users")
-    .list(`avatars/user_${userId}`);
+  const { data, error } = await supabase.storage.from("users").list("avatars", {
+    limit: 100,
+    offset: 0,
+    search: `user_${userId}`,
+  });
 
   if (error) {
-    return false;
-  } else {
+    return error;
+  }
+
+  if (data != undefined && data.length > 0) {
     return true;
+  } else {
+    return false;
   }
 };
 
@@ -49,15 +55,19 @@ const getUserAvatar = async (userId: string) => {
 };
 
 const uploadAvatar = async (userId: string, image: File) => {
-  const exists = checkFileExists(userId);
+  checkFileExists(userId).then(async (res) => {
+    if (res) {
+      updateAvatar(userId, image);
+    } else {
+      const { data, error } = await supabase.storage
+        .from("users")
+        .upload(`avatars/user_${userId}`, image);
 
-  if ((await exists) == false) {
-    const { data, error } = await supabase.storage
-      .from("users")
-      .upload(`avatars/user_${userId}`, image);
-  } else {
-    updateAvatar(userId, image);
-  }
+      if (error) {
+        return error;
+      }
+    }
+  });
 };
 
 const updateAvatar = async (userId: string, image: File) => {
@@ -67,12 +77,27 @@ const updateAvatar = async (userId: string, image: File) => {
       cacheControl: "3600",
       upsert: true,
     });
+
+  if (error) {
+    return error;
+  }
+};
+
+const deleteAvatar = async (userId: string) => {
+  const { data, error } = await supabase.storage
+    .from("users")
+    .remove([`avatars/user_${userId}`]);
+
+  if (error) {
+    return error;
+  }
 };
 
 export {
   changeUserDisplayName,
   changeUserEmail,
   checkFileExists,
+  deleteAvatar,
   getUserAvatar,
   uploadAvatar,
 };

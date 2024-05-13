@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import {
   changeUserDisplayName,
   changeUserEmail,
+  deleteAvatar,
   getUserAvatar,
   uploadAvatar,
 } from "../../../supabase/lib/userLogic";
@@ -29,6 +30,7 @@ function Settings() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [fileAvatar, setFileAvatar] = useState<File>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +39,11 @@ function Settings() {
       setDisplayName(session.data.session?.user.user_metadata.full_name || "");
       setEmail(session.data.session?.user.email || "");
       setUserId(session.data.session?.user.id || "");
-      setAvatar(await getUserAvatar(session.data.session?.user.id || ""));
+      if (session.data.session?.user.app_metadata?.provider === "github") {
+        setAvatar(session.data.session?.user.user_metadata.avatar_url || "");
+      } else {
+        setAvatar(await getUserAvatar(session.data.session?.user.id || ""));
+      }
     };
 
     fetchData();
@@ -53,7 +59,7 @@ function Settings() {
               x-chunk="dashboard-04-chunk-0"
             >
               <Link href="#" className="font-semibold text-primary">
-                General settings
+                Profile settings
               </Link>
             </nav>
             <div className="grid gap-6">
@@ -74,8 +80,9 @@ function Settings() {
                     <Image
                       className="rounded-full w-40 h-40 object-cover"
                       src={
-                        avatar ||
-                        "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg"
+                        !avatar
+                          ? "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg"
+                          : avatar
                       }
                       width={200}
                       height={200}
@@ -94,8 +101,8 @@ function Settings() {
                         onChange={(e) => {
                           if (e.target.files) {
                             const file = e.target.files[0];
-                            uploadAvatar(userId, file);
                             setAvatar(URL.createObjectURL(file));
+                            setFileAvatar(file);
                           }
                         }}
                       />
@@ -103,7 +110,51 @@ function Settings() {
                   </div>
                 </CardContent>
                 <CardFooter className="border-t px-6 py-4">
-                  <Button disabled={provider === "github"}>Save</Button>
+                  <div className="flex gap-4">
+                    <Button
+                      disabled={provider === "github"}
+                      onClick={async () => {
+                        if (fileAvatar) {
+                          await uploadAvatar(userId, fileAvatar).then((res) => {
+                            if (res) {
+                              toast({
+                                title: "error",
+                                description: "error updating avatar",
+                              });
+                            } else {
+                              toast({
+                                title: "Avatar updated",
+                                description: "changes will be visible soon",
+                              });
+                            }
+                          });
+                        }
+                      }}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      disabled={provider === "github"}
+                      onClick={async () => {
+                        await deleteAvatar(userId).then((res) => {
+                          if (res) {
+                            toast({
+                              title: "error",
+                              description: "error deleting avatar",
+                            });
+                          } else {
+                            toast({
+                              title: "Avatar deleted",
+                              description: "changes will be visible soon",
+                            });
+                          }
+                        });
+                      }}
+                      variant={"secondary"}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </CardFooter>
               </Card>
               <Card x-chunk="dashboard-04-chunk-1">
