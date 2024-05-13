@@ -1,4 +1,3 @@
-import { create } from "domain";
 import { supabase } from "../supabase";
 
 const registerWithEmail = async (
@@ -16,28 +15,8 @@ const registerWithEmail = async (
     },
   });
 
-  insertUserToDatabase(data.user?.id || "", email, name);
-  console.log(data.user?.id || "", email, name);
-
   if (error) {
     return error.message;
-  }
-};
-
-const insertUserToDatabase = async (
-  userAuthId: string,
-  email: string,
-  name: string
-) => {
-  const { error } = await supabase.from("users").insert({
-    user_auth_id: userAuthId,
-    email: email,
-    name: name,
-    created_at: new Date(),
-  });
-
-  if (error) {
-    console.error(error.message);
   }
 };
 
@@ -60,7 +39,7 @@ const githubLogIn = async () => {
   if (!error) {
     supabase.auth.onAuthStateChange((_, session) => {
       if (session) {
-        console.log("logined");
+        console.log("Loggined");
       }
     });
   }

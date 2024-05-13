@@ -63,26 +63,52 @@ export function Navbar() {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Link
-                          href="/dashboard/dashboard"
+                          href="/dashboard/projects"
                           className={`${
-                            router.pathname === "/dashboard/dashboard"
+                            router.pathname === "/dashboard/projects"
                               ? "group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
                               : "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                           }`}
                         >
                           <LayoutDashboard
                             className={`${
-                              router.pathname === "/dashboard/dashboard"
+                              router.pathname === "/dashboard/projects"
                                 ? "h-4 w-4 transition-all group-hover:scale-110"
                                 : "h-5 w-5"
                             }`}
                           />
-                          <span className="sr-only">Dashboard</span>
+                          <span className="sr-only">Projects</span>
                         </Link>
                       </TooltipTrigger>
-                      <TooltipContent side="right">Dashboard</TooltipContent>
+                      <TooltipContent side="right">Projects</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="/dashboard/friendships"
+                          className={`${
+                            router.pathname === "/dashboard/friendships"
+                              ? "group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
+                              : "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                          }`}
+                        >
+                          <Users2
+                            className={`${
+                              router.pathname === "/dashboard/friendships"
+                                ? "h-4 w-4 transition-all group-hover:scale-110"
+                                : "h-5 w-5"
+                            }`}
+                          />
+                          <span className="sr-only">Friendships</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Friendships</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </nav>
+                <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -107,36 +133,6 @@ export function Navbar() {
                       <TooltipContent side="right">Settings</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Link
-                          href="#"
-                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                        >
-                          <Users2 className="h-5 w-5" />
-                          <span className="sr-only">Customers</span>
-                        </Link>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">Customers</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </nav>
-                <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Link
-                          href="#"
-                          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                        >
-                          <Settings className="h-5 w-5" />
-                          <span className="sr-only">Settings</span>
-                        </Link>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">Settings</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
                 </nav>
               </aside>
             ) : null}
@@ -149,7 +145,7 @@ export function Navbar() {
                 <span className="sr-only">Acme Inc</span>
               </Link>
               <Link
-                href="#"
+                href="/"
                 className="text-foreground transition-colors hover:text-foreground text-lg font-semibold md:text-base"
               >
                 CollabMate
@@ -176,7 +172,7 @@ export function Navbar() {
                     <span className="sr-only">Acme Inc</span>
                   </Link>
                   <Link href="#" className="hover:text-foreground">
-                    Dashboard
+                    projects
                   </Link>
                   <Link
                     href="#"
@@ -255,7 +251,7 @@ export function Navbar() {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <Link href="/dashboard/user/settings">Settings</Link>
+                    <Link href="/projects/user/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logOut}>Logout</DropdownMenuItem>

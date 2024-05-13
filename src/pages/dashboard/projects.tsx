@@ -55,7 +55,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-function Dashboard() {
+function Projects() {
   return (
     <div className="pt-20">
       <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -406,4 +406,4 @@ function Dashboard() {
   );
 }
 
-export default withAuth(Dashboard);
+export default withAuth(Projects);
