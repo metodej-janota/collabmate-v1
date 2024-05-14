@@ -36,7 +36,7 @@ export default function Login() {
       if (res) {
         setError(res);
       } else {
-        router.push("/dashboard/dashboard");
+        router.push("/dashboard/projects");
       }
     });
   }

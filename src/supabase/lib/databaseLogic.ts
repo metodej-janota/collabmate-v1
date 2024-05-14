@@ -28,4 +28,15 @@ const userExistsInDatabase = async (userAuthId: string) => {
   }
 };
 
-export { insertUserToDatabase, userExistsInDatabase };
+const getNameById = async (userAuthId: string) => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("name")
+    .eq("userauthid", userAuthId);
+
+  if (data != undefined && data.length > 0) {
+    return data[0].name;
+  }
+};
+
+export { getNameById, insertUserToDatabase, userExistsInDatabase };
