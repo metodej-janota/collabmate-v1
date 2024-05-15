@@ -1,44 +1,10 @@
-import withAuth from "../../supabase/protectedRoutes";
-
-import {
-  File,
-  Home,
-  LineChart,
-  ListFilter,
-  MoreHorizontal,
-  Package,
-  Package2,
-  PanelLeft,
-  PlusCircle,
-  Search,
-  Settings,
-  ShoppingCart,
-  Users2,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -47,15 +13,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  getAllMyProgrammerProjects,
+  getNameById,
+} from "../../supabase/lib/databaseLogic";
+import withAuth from "../../supabase/protectedRoutes";
+import { supabase } from "../../supabase/supabase";
 
 function Projects() {
+  const [authId, setAuthId] = useState<string>("");
+  const [programmingProjects, setProgrammerProjects] = useState<any[]>([]);
+
+  useEffect(() => {
+    getAllMyProgrammerProjects(authId).then((res) => {
+      setProgrammerProjects(res as any[]);
+    });
+
+    const fetchData = async () => {
+      const session = await supabase.auth.getSession();
+      setAuthId(session.data.session?.user.id || "");
+    };
+
+    fetchData();
+  });
+
   return (
     <div className="pt-20">
       <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -63,49 +45,28 @@ function Projects() {
           <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             <Card x-chunk="dashboard-06-chunk-0">
               <CardHeader>
-                <CardTitle>Create new project!</CardTitle>
-                <CardDescription>
-                  Manage your products and view their sales performance.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button>
-                  <Link href="/dashboard/createProject">Create</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card x-chunk="dashboard-06-chunk-0">
-              <CardHeader>
-                <CardTitle>Products</CardTitle>
-                <CardDescription>
-                  Manage your products and view their sales performance.
-                </CardDescription>
+                <CardTitle>All my projects</CardTitle>
+                <CardDescription>Manage your projects here</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="hidden w-[100px] sm:table-cell">
-                        <span className="sr-only">Image</span>
-                      </TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Price
-                      </TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Total Sales
-                      </TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Created at
-                      </TableHead>
-                      <TableHead>
-                        <span className="sr-only">Actions</span>
-                      </TableHead>
+                      <TableHead>Project name</TableHead>
+                      <TableHead>Programmer</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Created at</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody></TableBody>
+                  <TableBody>
+                    {programmingProjects.map((project) => (
+                      <ProjectRow
+                        key={project.id}
+                        userAuthId={authId}
+                        projectData={project}
+                      />
+                    ))}
+                  </TableBody>
                 </Table>
               </CardContent>
             </Card>
@@ -116,44 +77,39 @@ function Projects() {
   );
 }
 
-const ProjectRow = () => {
+interface projectsProps {
+  userAuthId: string;
+  projectData: {
+    id: number;
+    project_name: string;
+    programmer: string;
+    customer: string;
+    created_at: string;
+  };
+}
+
+function ProjectRow({ userAuthId, projectData }: projectsProps) {
+  const [programmerName, setProgrammerName] = useState<string>("");
+  const [customerName, setCustomerName] = useState<string>("");
+  useEffect(() => {
+    getNameById(projectData.programmer).then((res) => {
+      setProgrammerName(res);
+    });
+    getNameById(projectData.customer).then((res) => {
+      setCustomerName(res);
+    });
+  });
+
   return (
-    <TableRow>
-      <TableCell className="hidden sm:table-cell">
-        <Image
-          alt="Product image"
-          className="aspect-square rounded-md object-cover"
-          height="64"
-          src="/placeholder.svg"
-          width="64"
-        />
-      </TableCell>
-      <TableCell className="font-medium">Hypernova Headphones</TableCell>
+    <TableRow key={projectData.id}>
+      <TableCell>{projectData.project_name}</TableCell>
+      <TableCell>{programmerName}</TableCell>
+      <TableCell>{customerName}</TableCell>
       <TableCell>
-        <Badge variant="outline">Active</Badge>
-      </TableCell>
-      <TableCell className="hidden md:table-cell">$129.99</TableCell>
-      <TableCell className="hidden md:table-cell">100</TableCell>
-      <TableCell className="hidden md:table-cell">
-        2023-10-18 03:21 PM
-      </TableCell>
-      <TableCell>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button aria-haspopup="true" size="icon" variant="ghost">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {new Date(projectData.created_at).toLocaleDateString("en-GB")}
       </TableCell>
     </TableRow>
   );
-};
+}
 
 export default withAuth(Projects);

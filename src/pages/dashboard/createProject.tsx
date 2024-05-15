@@ -23,14 +23,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { allFriends } from "@/supabase/lib/friendshipLogic";
-import Image from "next/image";
-import Link from "next/link";
-import { getNameById } from "../../supabase/lib/databaseLogic";
+import { useToast } from "../../components/ui/use-toast";
+import { createProject, getNameById } from "../../supabase/lib/databaseLogic";
 import { getUserAvatar } from "../../supabase/lib/userLogic";
 
 function CreateProject() {
+  const { toast } = useToast();
   const [authId, setAuthId] = useState<string>("");
   const [friends, setFriends] = useState<any[]>([]);
+
+  const [projectName, setProjectName] = useState<string>("");
+  const [selectedFriend, setSelectedFriend] = useState<string>("");
 
   useEffect(() => {
     allFriends(authId).then((res) => {
@@ -44,6 +47,36 @@ function CreateProject() {
 
     fetchData();
   });
+
+  function handleCreateProject() {
+    if (
+      projectName === "" ||
+      projectName === undefined ||
+      projectName === null ||
+      selectedFriend === "" ||
+      selectedFriend === undefined ||
+      selectedFriend === null
+    ) {
+      toast({
+        title: "error",
+        description: "Project name or friend can't be empty",
+      });
+      return;
+    }
+    createProject(projectName, authId, selectedFriend).then((res) => {
+      if (res) {
+        toast({
+          title: "error",
+          description: "Error creating project",
+        });
+      } else {
+        toast({
+          title: "Project created",
+          description: "Project " + projectName + " successfully created!",
+        });
+      }
+    });
+  }
 
   return (
     <div className="pt-20">
@@ -61,7 +94,12 @@ function CreateProject() {
                 <div className="flex flex-col gap-4">
                   <div>
                     <Label htmlFor="name">Project name</Label>
-                    <Input id="name" type="text" placeholder="School web" />
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="School web"
+                      onChange={(e) => setProjectName(e.target.value)}
+                    />
                   </div>
                   <Table>
                     <TableHeader>
@@ -81,7 +119,7 @@ function CreateProject() {
                             <Friend key={friend.id} userAuthId={friend.user2} />
                             <TableCell>
                               <Button
-                                onClick={() => console.log(friend.authId)}
+                                onClick={() => setSelectedFriend(friend.user2)}
                               >
                                 Invite
                               </Button>
@@ -91,13 +129,18 @@ function CreateProject() {
                           <TableRow key={friend.id}>
                             <Friend key={friend.id} userAuthId={friend.user1} />
                             <TableCell>
-                              <Button>Invite</Button>
+                              <Button
+                                onClick={() => setSelectedFriend(friend.user1)}
+                              >
+                                Invite
+                              </Button>
                             </TableCell>
                           </TableRow>
                         )
                       )}
                     </TableBody>
                   </Table>
+                  <Button onClick={handleCreateProject}>Create project</Button>
                 </div>
               </CardContent>
             </Card>

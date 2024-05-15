@@ -14,6 +14,7 @@ const insertUserToDatabase = async (
 
   if (error) {
     console.error(error.message);
+    return error;
   }
 };
 
@@ -39,4 +40,54 @@ const getNameById = async (userAuthId: string) => {
   }
 };
 
-export { getNameById, insertUserToDatabase, userExistsInDatabase };
+const createProject = async (
+  name: string,
+  programmer: string,
+  customer: string
+) => {
+  const { data, error } = await supabase.from("projects").insert({
+    project_name: name,
+    programmer: programmer,
+    customer: customer,
+    created_at: new Date(),
+  });
+
+  if (error) {
+    return error;
+  }
+};
+
+const getAllMyProgrammerProjects = async (userId: string) => {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("programmer", userId);
+
+  if (error) {
+    console.error(error.message);
+  }
+
+  return data;
+};
+
+const getAllMyCustomerProjects = async (userId: string) => {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("customer", userId);
+
+  if (error) {
+    console.error(error.message);
+  }
+
+  return data;
+};
+
+export {
+  createProject,
+  getAllMyCustomerProjects,
+  getAllMyProgrammerProjects,
+  getNameById,
+  insertUserToDatabase,
+  userExistsInDatabase,
+};

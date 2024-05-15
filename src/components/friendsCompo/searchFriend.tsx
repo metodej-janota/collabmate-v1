@@ -1,3 +1,4 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,13 +23,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MoreHorizontal } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   addFriend,
   searchUsersByName,
 } from "../../supabase/lib/friendshipLogic";
 import { getUserAvatar } from "../../supabase/lib/userLogic";
+import { useToast } from "../ui/use-toast";
 
 export const SearchFriend = ({ clientAuthId }: { clientAuthId: string }) => {
   const [searchedUsers, setSearchedUsers] = useState<any[]>([]);
@@ -83,6 +84,7 @@ interface SearchFriendProps {
 }
 
 function Friend({ clientAuthId, userAuthId, name }: SearchFriendProps) {
+  const { toast } = useToast();
   const [avatar, setAvatar] = useState<string | null>(null);
 
   useEffect(() => {
@@ -92,7 +94,19 @@ function Friend({ clientAuthId, userAuthId, name }: SearchFriendProps) {
   }, [userAuthId]);
 
   function addFriendship() {
-    addFriend(clientAuthId, userAuthId);
+    addFriend(clientAuthId, userAuthId).then((res) => {
+      if (res) {
+        toast({
+          title: "error",
+          description: "error updating display name",
+        });
+      } else {
+        toast({
+          title: "Friend added",
+          description: "You and " + name + " are now friends",
+        });
+      }
+    });
   }
 
   if (clientAuthId === userAuthId) {
@@ -102,13 +116,10 @@ function Friend({ clientAuthId, userAuthId, name }: SearchFriendProps) {
       <TableRow key={userAuthId}>
         <TableCell className="hidden sm:table-cell">
           {avatar && (
-            <Image
-              alt="user avatar"
-              className="aspect-square rounded-full object-cover"
-              height={64}
-              src={avatar}
-              width={64}
-            />
+            <Avatar className="aspect-square rounded-full object-cover w-16 h-16">
+              <AvatarImage src={avatar} />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
           )}
         </TableCell>
         <TableCell className="font-medium">{name}</TableCell>

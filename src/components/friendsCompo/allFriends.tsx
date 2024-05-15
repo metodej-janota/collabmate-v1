@@ -60,15 +60,24 @@ export const AllFriends = ({ authId }: { authId: string }) => {
               </TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Since</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {friends.map((friend) =>
               friend.user1 == authId ? (
-                <Friend key={friend.id} userAuthId={friend.user2} />
+                <Friend
+                  key={friend.id}
+                  userAuthId={friend.user2}
+                  data={friend}
+                />
               ) : (
-                <Friend key={friend.id} userAuthId={friend.user1} />
+                <Friend
+                  key={friend.id}
+                  userAuthId={friend.user1}
+                  data={friend}
+                />
               )
             )}
           </TableBody>
@@ -80,9 +89,15 @@ export const AllFriends = ({ authId }: { authId: string }) => {
 
 interface friendsProps {
   userAuthId: string;
+  data: {
+    id: string;
+    user1: string;
+    user2: string;
+    created_at: string;
+  };
 }
 
-function Friend({ userAuthId }: friendsProps) {
+function Friend({ userAuthId, data }: friendsProps) {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
 
@@ -107,6 +122,9 @@ function Friend({ userAuthId }: friendsProps) {
       </TableCell>
       <TableCell className="font-medium">{name}</TableCell>
       <TableCell>Friends</TableCell>
+      <TableCell>
+        {new Date(data.created_at).toLocaleDateString("en-GB")}
+      </TableCell>
       <TableCell>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
