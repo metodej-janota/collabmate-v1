@@ -1,3 +1,4 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -98,13 +99,10 @@ function Friend({ userAuthId }: friendsProps) {
     <TableRow key={userAuthId}>
       <TableCell className="hidden sm:table-cell">
         {avatar && (
-          <Image
-            alt="user avatar"
-            className="aspect-square rounded-md object-cover"
-            height={64}
-            src={avatar}
-            width={64}
-          />
+          <Avatar className="aspect-square rounded-full object-cover w-16 h-16">
+            <AvatarImage src={avatar} />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
         )}
       </TableCell>
       <TableCell className="font-medium">{name}</TableCell>

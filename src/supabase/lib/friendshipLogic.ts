@@ -45,21 +45,27 @@ const removeFriend = async (user1: string, user2: string) => {
 };
 
 const allFriends = async (user1: string) => {
+  const friendsData = [];
+
   const { data, error } = await supabase
     .from("friendships")
     .select("*")
     .filter("user1", "eq", user1);
 
-  if (error) {
-    console.error(error.message);
-    return [];
+  friendsData.push(data);
+
+  const { data: data2, error: error2 } = await supabase
+    .from("friendships")
+    .select("*")
+    .filter("user2", "eq", user1);
+
+  friendsData.push(data2);
+
+  if (error || error2) {
+    console.error(error?.message || error2?.message);
   }
 
-  if (data && data.length > 0) {
-    return data;
-  } else {
-    return [];
-  }
+  return friendsData.flat();
 };
 
 export { addFriend, allFriends, removeFriend, searchUsersByName };

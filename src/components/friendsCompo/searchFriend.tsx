@@ -104,7 +104,7 @@ function Friend({ clientAuthId, userAuthId, name }: SearchFriendProps) {
           {avatar && (
             <Image
               alt="user avatar"
-              className="aspect-square rounded-md object-cover"
+              className="aspect-square rounded-full object-cover"
               height={64}
               src={avatar}
               width={64}

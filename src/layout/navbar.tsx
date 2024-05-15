@@ -24,6 +24,7 @@ import {
   Moon,
   Package,
   Package2,
+  Plus,
   Search,
   Settings,
   Sun,
@@ -81,6 +82,32 @@ export function Navbar() {
                         </Link>
                       </TooltipTrigger>
                       <TooltipContent side="right">Projects</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="/dashboard/createProject"
+                          className={`${
+                            router.pathname === "/dashboard/createProject"
+                              ? "group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
+                              : "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                          }`}
+                        >
+                          <Plus
+                            className={`${
+                              router.pathname === "/dashboard/createProject"
+                                ? "h-4 w-4 transition-all group-hover:scale-110"
+                                : "h-5 w-5"
+                            }`}
+                          />
+                          <span className="sr-only">Create new project</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        Create new project
+                      </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                   <TooltipProvider>
@@ -251,7 +278,7 @@ export function Navbar() {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <Link href="/projects/user/settings">Settings</Link>
+                    <Link href="/dashboard/user/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logOut}>Logout</DropdownMenuItem>

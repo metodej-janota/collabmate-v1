@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -79,22 +80,16 @@ function Settings() {
                 </CardHeader>
                 <CardContent className="flex gap-4">
                   <div className="flex w-full">
-                    <Image
-                      className="rounded-full w-40 h-40 object-cover"
-                      src={
-                        !avatar
-                          ? "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg"
-                          : avatar
-                      }
-                      width={200}
-                      height={200}
-                      alt="avatar"
-                      priority={true}
-                      fetchPriority="high"
-                      loader={({ src }) => src}
-                      loading="eager"
-                      unoptimized
-                    />
+                    <Avatar className="aspect-square rounded-full object-cover w-28 h-28">
+                      <AvatarImage
+                        src={
+                          !avatar
+                            ? "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg"
+                            : avatar
+                        }
+                      />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
                     <form className="w-full">
                       <Input
                         placeholder="Email"

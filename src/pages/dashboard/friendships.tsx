@@ -1,63 +1,19 @@
-import { useEffect, useState } from "react";
-import {
-  addFriend,
-  allFriends,
-  removeFriend,
-  searchUsersByName,
-} from "../../supabase/lib/friendshipLogic";
-import { getUserAvatar } from "../../supabase/lib/userLogic";
-import withAuth from "../../supabase/protectedRoutes";
-
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { MoreHorizontal } from "lucide-react";
-import Image from "next/image";
-import { supabase } from "../../supabase/supabase";
-
 import { AllFriends } from "@/components/friendsCompo/allFriends";
 import { SearchFriend } from "@/components/friendsCompo/searchFriend";
+import { useEffect, useState } from "react";
+import withAuth from "../../supabase/protectedRoutes";
+import { supabase } from "../../supabase/supabase";
 
 function Friendships() {
   const [authId, setAuthId] = useState<string>("");
-  const [friends, setFriends] = useState<any[]>([]);
-
-  function removeFriendship(id: string, userAuthId1: string) {
-    removeFriend(id, userAuthId1);
-  }
 
   useEffect(() => {
-    allFriends(authId).then((res) => {
-      setFriends(res as any[]);
-    });
-
     const fetchData = async () => {
       const session = await supabase.auth.getSession();
       setAuthId(session.data.session?.user.id || "");
     };
-
     fetchData();
-  });
+  }, []);
 
   return (
     <>
