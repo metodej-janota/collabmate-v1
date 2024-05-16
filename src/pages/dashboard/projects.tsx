@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {
   getAllMyProgrammerProjects,
@@ -84,6 +85,7 @@ interface projectsProps {
     project_name: string;
     programmer: string;
     customer: string;
+    project_url: string;
     created_at: string;
   };
 }
@@ -91,6 +93,8 @@ interface projectsProps {
 function ProjectRow({ userAuthId, projectData }: projectsProps) {
   const [programmerName, setProgrammerName] = useState<string>("");
   const [customerName, setCustomerName] = useState<string>("");
+  const router = useRouter();
+
   useEffect(() => {
     getNameById(projectData.programmer).then((res) => {
       setProgrammerName(res);
@@ -101,7 +105,13 @@ function ProjectRow({ userAuthId, projectData }: projectsProps) {
   });
 
   return (
-    <TableRow key={projectData.id}>
+    <TableRow
+      key={projectData.id}
+      className="cursor-pointer"
+      onClick={() =>
+        router.replace("/dashboard/project/" + projectData.project_url)
+      }
+    >
       <TableCell>{projectData.project_name}</TableCell>
       <TableCell>{programmerName}</TableCell>
       <TableCell>{customerName}</TableCell>

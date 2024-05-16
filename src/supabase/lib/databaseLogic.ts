@@ -49,6 +49,15 @@ const createProject = async (
     project_name: name,
     programmer: programmer,
     customer: customer,
+    project_url:
+      //odstranit diakritiku
+      name
+        .replace(/\s/g, "-")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") +
+      "-" +
+      (Math.random() * 1000000).toFixed(0),
     created_at: new Date(),
   });
 

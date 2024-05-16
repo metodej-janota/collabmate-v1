@@ -134,7 +134,7 @@ function Friend({ userAuthId, data }: friendsProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Add</DropdownMenuItem>
+            <DropdownMenuItem>Remove</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>

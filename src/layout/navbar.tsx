@@ -55,7 +55,7 @@ export function Navbar() {
   return (
     <>
       {logined ? (
-        <div className="flex fixed w-full flex-col">
+        <div className="flex fixed w-full flex-col z-50">
           <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
             {logined ? (
               <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -191,39 +191,48 @@ export function Navbar() {
               </SheetTrigger>
               <SheetContent side="left">
                 <nav className="grid gap-6 text-lg font-medium">
-                  <Link
-                    href="#"
-                    className="flex items-center gap-2 text-lg font-semibold"
-                  >
-                    <Package2 className="h-6 w-6" />
-                    <span className="sr-only">Acme Inc</span>
-                  </Link>
-                  <Link href="#" className="hover:text-foreground">
-                    projects
+                  <Link href="/dashboard/projects" className="text-2xl">
+                    CollabMate
                   </Link>
                   <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
+                    href="/dashboard/projects"
+                    className={`${
+                      router.pathname === "/dashboard/projects"
+                        ? "hover:text-foreground text-orange-400"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
                   >
-                    Orders
+                    Dashboard
                   </Link>
                   <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
+                    href="/dashboard/createProject"
+                    className={`${
+                      router.pathname === "/dashboard/createProject"
+                        ? "hover:text-foreground text-orange-400"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
                   >
-                    Products
+                    Create new project
                   </Link>
                   <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
+                    href="/dashboard/friendships"
+                    className={`${
+                      router.pathname === "/dashboard/friendships"
+                        ? "hover:text-foreground text-orange-400"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
                   >
-                    Customers
+                    Friendships
                   </Link>
                   <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
+                    href="/dashboard/user/settings"
+                    className={`${
+                      router.pathname === "/dashboard/user/settings"
+                        ? "hover:text-foreground text-orange-400"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
                   >
-                    Analytics
+                    Settings
                   </Link>
                 </nav>
               </SheetContent>
