@@ -2,6 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { getThisProject } from "@/supabase/lib/projectLogic";
 import { supabase } from "@/supabase/supabase";
 import { Laptop, Smartphone, Tablet } from "lucide-react";
@@ -32,6 +40,7 @@ const Project = ({
   const [buttonsFull, setButtonsFull] = useState<{ x: number; y: number }[]>(
     []
   );
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,6 +49,11 @@ const Project = ({
     };
 
     fetchData();
+
+    document.addEventListener("keydown", openSheetOnTabulatorPress);
+    return () => {
+      document.removeEventListener("keydown", openSheetOnTabulatorPress);
+    };
   });
 
   if (router.isFallback) {
@@ -78,6 +92,17 @@ const Project = ({
     }
   };
 
+  function openSheetOnTabulatorPress(e: KeyboardEvent) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      if (open) {
+        setOpen(false);
+      } else {
+        setOpen(true);
+      }
+    }
+  }
+
   const mobile = "w-[412px]";
   const tablet = "w-[1024px]";
   const full = "w-full";
@@ -87,85 +112,98 @@ const Project = ({
 
   if (project.customer === authId || project.programmer === authId) {
     return (
-      <div className="flex min-h-screen w-full flex-col mt-auto pt-20 lg:pt-0">
-        <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-2 md:pl-20 md:pt-20">
-          <Card className="p-4 hidden lg:block">
-            <div className="flex gap-2">
-              <Button onClick={() => handleChangeResolution(mobile)}>
-                <Smartphone />
-              </Button>
-              <Button onClick={() => handleChangeResolution(tablet)}>
-                <Tablet />
-              </Button>
-              <Button onClick={() => handleChangeResolution(full)}>
-                <Laptop />
-              </Button>
-            </div>
-          </Card>
-          <Card className="p-2">
-            <div
-              style={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-              }}
-            >
+      <>
+        <Sheet open={open}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Are you absolutely sure?</SheetTitle>
+              <SheetDescription>
+                This action cannot be undone. This will permanently delete your
+                account and remove your data from our servers.
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+        <div className="flex min-h-screen w-full flex-col mt-auto pt-20 lg:pt-0">
+          <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-2 md:pl-20 md:pt-20">
+            <Card className="p-4 hidden lg:block">
+              <div className="flex gap-2">
+                <Button onClick={() => handleChangeResolution(mobile)}>
+                  <Smartphone />
+                </Button>
+                <Button onClick={() => handleChangeResolution(tablet)}>
+                  <Tablet />
+                </Button>
+                <Button onClick={() => handleChangeResolution(full)}>
+                  <Laptop />
+                </Button>
+              </div>
+            </Card>
+            <Card className="p-2">
               <div
-                className="z-30 w-full h-[10000px]"
                 style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
+                  position: "relative",
                   width: "100%",
                   height: "100%",
                 }}
-                onClick={handleCreateProps}
               >
-                {resolution === "w-[412px]" &&
-                  buttonsMobile.map((button, index) => (
-                    <div
-                      key={index}
-                      className="absolute z-40 bg-red-500 w-4 h-4 rounded-full"
-                      style={{
-                        top: button.y,
-                        left: button.x,
-                      }}
-                    ></div>
-                  ))}
-                {resolution === "w-[1024px]" &&
-                  buttonsTablet.map((button, index) => (
-                    <div
-                      key={index}
-                      className="absolute z-40 bg-red-500 w-4 h-4 rounded-full"
-                      style={{
-                        top: button.y,
-                        left: button.x,
-                      }}
-                    ></div>
-                  ))}
-                {resolution === "w-full" &&
-                  buttonsFull.map((button, index) => (
-                    <div
-                      key={index}
-                      className="absolute z-40 bg-red-500 w-4 h-4 rounded-full"
-                      style={{
-                        top: button.y,
-                        left: button.x,
-                      }}
-                    ></div>
-                  ))}
+                <div
+                  className="z-30 w-full h-[10000px]"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    width: "100%",
+                    height: "100%",
+                  }}
+                  onClick={handleCreateProps}
+                >
+                  {resolution === "w-[412px]" &&
+                    buttonsMobile.map((button, index) => (
+                      <div
+                        key={index}
+                        className="absolute z-40 bg-red-500 w-4 h-4 rounded-full"
+                        style={{
+                          top: button.y,
+                          left: button.x,
+                        }}
+                      ></div>
+                    ))}
+                  {resolution === "w-[1024px]" &&
+                    buttonsTablet.map((button, index) => (
+                      <div
+                        key={index}
+                        className="absolute z-40 bg-red-500 w-4 h-4 rounded-full"
+                        style={{
+                          top: button.y,
+                          left: button.x,
+                        }}
+                      ></div>
+                    ))}
+                  {resolution === "w-full" &&
+                    buttonsFull.map((button, index) => (
+                      <div
+                        key={index}
+                        className="absolute z-40 bg-red-500 w-4 h-4 rounded-full"
+                        style={{
+                          top: button.y,
+                          left: button.x,
+                        }}
+                      ></div>
+                    ))}
+                </div>
+                <iframe
+                  className={`${resolution} h-[10000px]`}
+                  src={`https://metodejjanota.cz`}
+                  title={project.project_name}
+                ></iframe>
               </div>
-              <iframe
-                className={`${resolution} h-[10000px]`}
-                src={`https://metodejjanota.cz`}
-                title={project.project_name}
-              ></iframe>
-            </div>
-          </Card>
-        </main>
-      </div>
+            </Card>
+          </main>
+        </div>
+      </>
     );
   } else {
     return (
