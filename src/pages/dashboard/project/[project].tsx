@@ -1,19 +1,28 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { getNameById } from "@/supabase/lib/databaseLogic";
 import { getThisProject } from "@/supabase/lib/projectLogic";
+import withAuth from "@/supabase/protectedRoutes";
 import { supabase } from "@/supabase/supabase";
-import { Laptop, Smartphone, Tablet, X } from "lucide-react";
+import { Laptop, Smartphone, Tablet } from "lucide-react";
 import { useRouter } from "next/router";
+import * as React from "react";
 import { useEffect, useState } from "react";
 
 const Project = ({
@@ -44,8 +53,15 @@ const Project = ({
   };
 }) => {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
   const [authId, setAuthId] = useState<string>("");
+  const [custommerName, setCustomerName] = useState<string>("");
+  const [programmerName, setProgrammerName] = useState<string>("");
+  const [fullJSON, setFullJSON] = useState<{
+    sites: {
+      props: any;
+      url: string;
+    }[];
+  } | null>(null);
   const [resolution, setResolution] = useState("w-full");
   const [propsMobile, setPropsMobile] = useState<
     { x: number; y: number; heading: string; text: string }[]
@@ -56,12 +72,8 @@ const Project = ({
   const [propsFull, setPropsFull] = useState<
     { x: number; y: number; heading: string; text: string }[]
   >([]);
-  const [fullJSON, setFullJSON] = useState<{
-    sites: {
-      props: any;
-      url: string;
-    }[];
-  } | null>(null);
+
+  const [open, setOpen] = React.useState(false);
   const [activeSiteUrl, setActiveSiteUrl] = useState<string>("");
 
   useEffect(() => {
@@ -69,58 +81,13 @@ const Project = ({
       const session = await supabase.auth.getSession();
       setAuthId(session.data.session?.user.id || "");
       setFullJSON(project.project_props);
-
-      if (project.project_props && project.project_props.sites.length > 0) {
-        const firstSite = project.project_props.sites[0];
-        setActiveSiteUrl(firstSite.url);
-        setPropsFull(firstSite.props);
-      }
+      const customerName = await getNameById(project.customer);
+      setCustomerName(customerName);
+      const programmerName = await getNameById(project.programmer);
+      setProgrammerName(programmerName);
     };
     fetchData();
-
-    document.addEventListener("keydown", openSheetOnTabulatorPress);
-    return () => {
-      document.removeEventListener("keydown", openSheetOnTabulatorPress);
-    };
-  }, [project.project_props]);
-
-  if (router.isFallback) {
-    return <div>Loading...</div>;
-  }
-
-  const handleCreateProps = (e: React.MouseEvent) => {
-    const rect = (e.target as HTMLElement).getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-    if (resolution === "w-[412px]") {
-      setPropsMobile([...propsMobile, { x, y, heading: "", text: "" }]);
-    } else if (resolution === "w-[1024px]") {
-      setPropsTablet([...propsTablet, { x, y, heading: "", text: "" }]);
-    } else {
-      setPropsFull([...propsFull, { x, y, heading: "", text: "" }]);
-    }
-  };
-
-  function openSheetOnTabulatorPress(e: KeyboardEvent) {
-    if (e.key === "Tab") {
-      e.preventDefault();
-      setOpen(!open);
-    }
-  }
-
-  const handleSiteChange = (url: string, siteIndex: number) => {
-    setActiveSiteUrl(url);
-    const siteProps = fullJSON?.sites[siteIndex]?.props || [];
-
-    if (resolution === "w-[412px]") {
-      setPropsMobile(siteProps);
-    } else if (resolution === "w-[1024px]") {
-      setPropsTablet(siteProps);
-    } else {
-      setPropsFull(siteProps);
-    }
-  };
+  });
 
   const mobile = "w-[412px]";
   const tablet = "w-[1024px]";
@@ -138,6 +105,20 @@ const Project = ({
       setPropsTablet(siteProps);
     } else {
       setPropsFull(siteProps);
+    }
+  };
+
+  const handleCreateProps = (e: React.MouseEvent) => {
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    if (resolution === "w-[412px]") {
+      setPropsMobile([...propsMobile, { x, y, heading: "", text: "" }]);
+    } else if (resolution === "w-[1024px]") {
+      setPropsTablet([...propsTablet, { x, y, heading: "", text: "" }]);
+    } else {
+      setPropsFull([...propsFull, { x, y, heading: "", text: "" }]);
     }
   };
 
@@ -163,81 +144,144 @@ const Project = ({
     }
   };
 
-  const handleSave = async () => {
-    if (fullJSON) {
-      const updatedSites = fullJSON.sites.map((site) => {
-        if (site.url === activeSiteUrl) {
-          return {
-            ...site,
-            props:
-              resolution === "w-[412px]"
-                ? propsMobile
-                : resolution === "w-[1024px]"
-                ? propsTablet
-                : propsFull,
-          };
-        }
-        return site;
-      });
-
-      const updatedFullJSON = { ...fullJSON, sites: updatedSites };
-      setFullJSON(updatedFullJSON);
-
-      await supabase
-        .from("projects")
-        .update({ project_props: updatedFullJSON })
-        .eq("id", project.id);
-    }
-  };
-
+  if (router.isFallback) {
+    return <div>Loading...</div>;
+  }
   if (project.customer === authId || project.programmer === authId) {
     return (
-      <>
-        {fullJSON != null ? (
-          <Sheet open={open}>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>All project sites</SheetTitle>
-                <SheetDescription>
-                  Click on a site to view it in and add props to it!
-                </SheetDescription>
-              </SheetHeader>
-              <br />
-              <div className="flex flex-col gap-2">
-                {fullJSON.sites.map((site) => (
-                  <Button
-                    key={site.url}
-                    variant={
-                      site.url === activeSiteUrl ? "outline" : "secondary"
-                    }
-                    onClick={() =>
-                      handleSiteChange(site.url, fullJSON.sites.indexOf(site))
-                    }
-                  >
-                    {site.url}
-                  </Button>
-                ))}
-                <Button onClick={() => setOpen(false)}>Create new site</Button>
-              </div>
-            </SheetContent>
-          </Sheet>
-        ) : null}
-        <div className="flex min-h-screen w-full flex-col mt-auto pt-20 lg:pt-0">
-          <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-2 md:pl-20 md:pt-20">
-            <Button onClick={handleSave}>Save Changes</Button>
-            <Card className="p-4 hidden lg:block">
-              <div className="flex gap-2">
-                <Button onClick={() => handleChangeResolution(full)}>
-                  <Laptop />
-                </Button>
-                <Button onClick={() => handleChangeResolution(tablet)}>
-                  <Tablet />
-                </Button>
-                <Button onClick={() => handleChangeResolution(mobile)}>
-                  <Smartphone />
-                </Button>
-              </div>
+      <div className="flex min-h-screen w-full flex-col mt-auto pt-20 lg:pt-0">
+        <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-2 md:pl-20 md:pt-20">
+          <div className="grid grid-cols-6 grid-rows-6 gap-4">
+            <Card className="col-span-3 row-span-3">
+              <CardContent>
+                <CardTitle className="text-4xl font-bold mt-4">
+                  {project.project_name}
+                </CardTitle>
+                <p className="mt-2">
+                  Projecr created at:{" "}
+                  <span className="text-orange-500">
+                    {new Date(project.created_at).toLocaleDateString("en-GB")}
+                  </span>
+                </p>
+                <p>
+                  Programmer:{" "}
+                  <span className="text-orange-500">{programmerName}</span>
+                </p>
+                <p>
+                  Customer:{" "}
+                  <span className="text-orange-500">{custommerName}</span>
+                </p>
+              </CardContent>
             </Card>
+            <Card className="col-span-3 row-span-6 col-start-4">
+              <CardContent>
+                <CardTitle className="text-4xl font-bold mt-4">
+                  Project chat
+                </CardTitle>
+              </CardContent>
+            </Card>
+            {/* 
+            ██╗░░░░░░█████╗░░██████╗░██╗░█████╗░
+            ██║░░░░░██╔══██╗██╔════╝░██║██╔══██╗
+            ██║░░░░░██║░░██║██║░░██╗░██║██║░░╚═╝
+            ██║░░░░░██║░░██║██║░░╚██╗██║██║░░██╗
+            ███████╗╚█████╔╝╚██████╔╝██║╚█████╔╝
+            ╚══════╝░╚════╝░░╚═════╝░╚═╝░╚════╝░
+            */}
+            <Card className="col-span-3 row-span-3 row-start-4">
+              <CardContent>
+                <CardTitle className="text-4xl font-bold mt-4">
+                  Project settings
+                </CardTitle>
+                <div className="mt-2 flex flex-col gap-8">
+                  <div className="flex flex-col gap-2">
+                    <p>Selected site</p>
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full justify-start"
+                        >
+                          {activeSiteUrl ? (
+                            <>{activeSiteUrl}</>
+                          ) : (
+                            <>Select your site you want to edit</>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-full"
+                        side="bottom"
+                        align="start"
+                      >
+                        <Command>
+                          <CommandInput placeholder="Change status..." />
+                          <CommandList>
+                            <CommandEmpty>No results found.</CommandEmpty>
+                            <CommandGroup>
+                              {fullJSON?.sites.map((site, index) => (
+                                <CommandItem
+                                  key={index}
+                                  value={site.url}
+                                  onSelect={(site) => {
+                                    setActiveSiteUrl(site as string);
+                                    setOpen(false);
+                                  }}
+                                >
+                                  <span>{site.url}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <p>Create new page:</p>
+                    <Input placeholder="Page url (without https://)" />
+                    <Button className="w-full" variant={"outline"}>
+                      Create
+                    </Button>
+                  </div>
+
+                  <div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleChangeResolution(full)}
+                        variant={"outline"}
+                      >
+                        <Laptop />
+                      </Button>
+                      <Button
+                        onClick={() => handleChangeResolution(tablet)}
+                        variant={"outline"}
+                      >
+                        <Tablet />
+                      </Button>
+                      <Button
+                        onClick={() => handleChangeResolution(mobile)}
+                        variant={"outline"}
+                      >
+                        <Smartphone />
+                      </Button>
+                      <Button className="w-full">Save Changes</Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          {/* 
+          ██████╗░██████╗░░█████╗░░░░░░██╗███████╗░█████╗░████████╗
+          ██╔══██╗██╔══██╗██╔══██╗░░░░░██║██╔════╝██╔══██╗╚══██╔══╝
+          ██████╔╝██████╔╝██║░░██║░░░░░██║█████╗░░██║░░╚═╝░░░██║░░░
+          ██╔═══╝░██╔══██╗██║░░██║██╗░░██║██╔══╝░░██║░░██╗░░░██║░░░
+          ██║░░░░░██║░░██║╚█████╔╝╚█████╔╝███████╗╚█████╔╝░░░██║░░░
+          ╚═╝░░░░░╚═╝░░╚═╝░╚════╝░░╚════╝░╚══════╝░╚════╝░░░░╚═╝░░░
+          */}
+          <div className="mt-2">
             <Card className="p-2">
               <div
                 style={{
@@ -381,9 +425,9 @@ const Project = ({
                 ></iframe>
               </div>
             </Card>
-          </main>
-        </div>
-      </>
+          </div>
+        </main>
+      </div>
     );
   } else {
     return (
@@ -415,4 +459,4 @@ export async function getServerSideProps({
   };
 }
 
-export default Project;
+export default withAuth(Project);
