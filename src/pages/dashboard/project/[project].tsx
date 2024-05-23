@@ -138,7 +138,15 @@ const Project = ({
 
       const newFullJSON = JSON.parse(JSON.stringify(prev));
       const site = newFullJSON.sites[indexOfSite];
-      const prop = { x, y, heading: "", text: "" };
+
+      const prop = {
+        propType: propType,
+        x: x,
+        y: y,
+        heading: "",
+        text: "",
+        color: propType === "colorProp" ? "#000000" : "",
+      };
 
       if (resolution === mobile) {
         site.props.mobile.push(prop);
@@ -475,123 +483,195 @@ const Project = ({
                   >
                     {resolution === mobile &&
                       fullJSON?.sites[indexOfSite].props?.mobile?.map(
-                        (prop: any, index: any) => (
-                          <Card
-                            key={index}
-                            className="absolute z-40 bg-white border rounded p-2 opacity-50 hover:opacity-100 transition-opacity duration-300"
-                            style={{
-                              top: `${prop.y}%`,
-                              left: `${prop.x}%`,
-                            }}
-                          >
-                            <Input
-                              className="bg-white text-black"
-                              placeholder="Heading"
-                              value={prop.heading}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  index,
-                                  "heading",
-                                  e.target.value,
-                                  resolution
-                                )
-                              }
-                            />
-                            <Input
-                              className="bg-white text-black"
-                              placeholder="Text"
-                              value={prop.text}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  index,
-                                  "text",
-                                  e.target.value,
-                                  resolution
-                                )
-                              }
-                            />
-                          </Card>
-                        )
+                        (prop: any, index: any) =>
+                          prop.propType === "textProp" ? (
+                            <Card
+                              key={index}
+                              className="absolute z-40 bg-white border rounded p-2 opacity-50 hover:opacity-100 transition-opacity duration-300"
+                              style={{
+                                top: `${prop.y}%`,
+                                left: `${prop.x}%`,
+                              }}
+                            >
+                              <Input
+                                className="bg-white text-black"
+                                placeholder="Heading"
+                                value={prop.heading}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "heading",
+                                    e.target.value,
+                                    resolution
+                                  )
+                                }
+                              />
+                              <Input
+                                className="bg-white text-black"
+                                placeholder="Text"
+                                value={prop.text}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "text",
+                                    e.target.value,
+                                    resolution
+                                  )
+                                }
+                              />
+                            </Card>
+                          ) : (
+                            <div
+                              key={index}
+                              className="absolute z-40 border w-20 h-20 p-2 opacity-50 hover:opacity-100 transition-opacity duration-300 rounded-full bg-white"
+                              style={{
+                                top: `${prop.y}%`,
+                                left: `${prop.x}%`,
+                              }}
+                            >
+                              <Input
+                                type="color"
+                                className="w-full h-full background-color-transparent border-none"
+                                value={prop.color}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "color",
+                                    e.target.value,
+                                    resolution
+                                  )
+                                }
+                              />
+                            </div>
+                          )
                       )}
                     {resolution === tablet &&
                       fullJSON?.sites[indexOfSite].props?.tablet?.map(
-                        (prop: any, index: any) => (
-                          <Card
-                            key={index}
-                            className="absolute z-40 bg-white border rounded p-2 opacity-50 hover:opacity-100 transition-opacity duration-300"
-                            style={{
-                              top: `${prop.y}%`,
-                              left: `${prop.x}%`,
-                            }}
-                          >
-                            <Input
-                              className="bg-white text-black"
-                              placeholder="Heading"
-                              value={prop.heading}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  index,
-                                  "heading",
-                                  e.target.value,
-                                  resolution
-                                )
-                              }
-                            />
-                            <Input
-                              className="bg-white text-black"
-                              placeholder="Text"
-                              value={prop.text}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  index,
-                                  "text",
-                                  e.target.value,
-                                  resolution
-                                )
-                              }
-                            />
-                          </Card>
-                        )
+                        (prop: any, index: any) =>
+                          prop.propType === "textProp" ? (
+                            <Card
+                              key={index}
+                              className="absolute z-40 bg-white border rounded p-2 opacity-50 hover:opacity-100 transition-opacity duration-300"
+                              style={{
+                                top: `${prop.y}%`,
+                                left: `${prop.x}%`,
+                              }}
+                            >
+                              <Input
+                                className="bg-white text-black"
+                                placeholder="Heading"
+                                value={prop.heading}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "heading",
+                                    e.target.value,
+                                    resolution
+                                  )
+                                }
+                              />
+                              <Input
+                                className="bg-white text-black"
+                                placeholder="Text"
+                                value={prop.text}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "text",
+                                    e.target.value,
+                                    resolution
+                                  )
+                                }
+                              />
+                            </Card>
+                          ) : (
+                            <div
+                              key={index}
+                              className="absolute z-40 border w-20 h-20 p-2 opacity-50 hover:opacity-100 transition-opacity duration-300 rounded-full bg-white"
+                              style={{
+                                top: `${prop.y}%`,
+                                left: `${prop.x}%`,
+                              }}
+                            >
+                              <Input
+                                type="color"
+                                className="w-full h-full background-color-transparent border-none"
+                                value={prop.color}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "color",
+                                    e.target.value,
+                                    resolution
+                                  )
+                                }
+                              />
+                            </div>
+                          )
                       )}
                     {resolution === full &&
                       fullJSON?.sites[indexOfSite].props?.full?.map(
-                        (prop: any, index: any) => (
-                          <Card
-                            key={index}
-                            className="absolute z-40 bg-white border rounded p-2 opacity-50 hover:opacity-100 transition-opacity duration-300"
-                            style={{
-                              top: `${prop.y}%`,
-                              left: `${prop.x}%`,
-                            }}
-                          >
-                            <Input
-                              className="bg-white text-black"
-                              placeholder="Heading"
-                              value={prop.heading}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  index,
-                                  "heading",
-                                  e.target.value,
-                                  resolution
-                                )
-                              }
-                            />
-                            <Input
-                              className="bg-white text-black"
-                              placeholder="Text"
-                              value={prop.text}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  index,
-                                  "text",
-                                  e.target.value,
-                                  resolution
-                                )
-                              }
-                            />
-                          </Card>
-                        )
+                        (prop: any, index: any) =>
+                          prop.propType === "textProp" ? (
+                            <Card
+                              key={index}
+                              className="absolute z-40 bg-white border rounded p-2 opacity-50 hover:opacity-100 transition-opacity duration-300"
+                              style={{
+                                top: `${prop.y}%`,
+                                left: `${prop.x}%`,
+                              }}
+                            >
+                              <Input
+                                className="bg-white text-black"
+                                placeholder="Heading"
+                                value={prop.heading}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "heading",
+                                    e.target.value,
+                                    resolution
+                                  )
+                                }
+                              />
+                              <Input
+                                className="bg-white text-black"
+                                placeholder="Text"
+                                value={prop.text}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "text",
+                                    e.target.value,
+                                    resolution
+                                  )
+                                }
+                              />
+                            </Card>
+                          ) : (
+                            <div
+                              key={index}
+                              className="absolute z-40 border w-20 h-20 p-2 opacity-50 hover:opacity-100 transition-opacity duration-300 rounded-full bg-white"
+                              style={{
+                                top: `${prop.y}%`,
+                                left: `${prop.x}%`,
+                              }}
+                            >
+                              <Input
+                                type="color"
+                                className="w-full h-full background-color-transparent border-none"
+                                value={prop.color}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    index,
+                                    "color",
+                                    e.target.value,
+                                    resolution
+                                  )
+                                }
+                              />
+                            </div>
+                          )
                       )}
                   </div>
                   <iframe
