@@ -16,6 +16,7 @@ import {
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {
+  getAllMyCustomerProjects,
   getAllMyProgrammerProjects,
   getNameById,
 } from "../../supabase/lib/databaseLogic";
@@ -25,10 +26,14 @@ import { supabase } from "../../supabase/supabase";
 function Projects() {
   const [authId, setAuthId] = useState<string>("");
   const [programmingProjects, setProgrammerProjects] = useState<any[]>([]);
+  const [customerProjects, setCustomerProjects] = useState<any[]>([]);
 
   useEffect(() => {
     getAllMyProgrammerProjects(authId).then((res) => {
       setProgrammerProjects(res as any[]);
+    });
+    getAllMyCustomerProjects(authId).then((res) => {
+      setCustomerProjects(res as any[]);
     });
 
     const fetchData = async () => {
@@ -61,6 +66,14 @@ function Projects() {
                   </TableHeader>
                   <TableBody>
                     {programmingProjects.map((project) => (
+                      <ProjectRow
+                        key={project.id}
+                        userAuthId={authId}
+                        projectData={project}
+                      />
+                    ))}
+
+                    {customerProjects.map((project) => (
                       <ProjectRow
                         key={project.id}
                         userAuthId={authId}

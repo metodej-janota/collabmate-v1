@@ -50,7 +50,6 @@ const createProject = async (
     programmer: programmer,
     customer: customer,
     project_url:
-      //odstranit diakritiku
       name
         .replace(/\s/g, "-")
         .toLowerCase()
