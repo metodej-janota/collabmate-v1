@@ -259,6 +259,30 @@ const Project = ({
     await handleSaveChanges();
   };
 
+  const handleDeleteAllProps = () => {
+    setFullJSON((prev) => {
+      if (!prev) return null;
+
+      const newFullJSON = JSON.parse(JSON.stringify(prev));
+      const site = newFullJSON.sites[indexOfSite];
+
+      if (resolution === mobile) {
+        site.props.mobile = [];
+      } else if (resolution === tablet) {
+        site.props.tablet = [];
+      } else {
+        site.props.full = [];
+      }
+
+      return newFullJSON;
+    });
+
+    toast({
+      title: "All props deleted",
+      description: "You have successfully deleted all props",
+    });
+  };
+
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
@@ -449,9 +473,18 @@ const Project = ({
                           Color prop
                         </Button>
                       </div>
-                      <Button onClick={handleSaveChanges} className="w-full">
-                        Save Changes
-                      </Button>
+                      <div className="flex gap-2 w-full">
+                        <Button
+                          variant={"outline"}
+                          className="w-full"
+                          onClick={handleDeleteAllProps}
+                        >
+                          Delete all props
+                        </Button>
+                        <Button onClick={handleSaveChanges} className="w-full">
+                          Save Changes
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>

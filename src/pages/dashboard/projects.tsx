@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,6 +7,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Table,
   TableBody,
   TableCell,
@@ -13,13 +21,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useToast } from "@/components/ui/use-toast";
+import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { getNameById } from "../../supabase/lib/databaseLogic";
 import {
+  deleteProject,
   getAllMyCustomerProjects,
   getAllMyProgrammerProjects,
-  getNameById,
-} from "../../supabase/lib/databaseLogic";
+} from "../../supabase/lib/projectLogic";
 import withAuth from "../../supabase/protectedRoutes";
 import { supabase } from "../../supabase/supabase";
 
@@ -29,16 +40,15 @@ function Projects() {
   const [customerProjects, setCustomerProjects] = useState<any[]>([]);
 
   useEffect(() => {
-    getAllMyProgrammerProjects(authId).then((res) => {
-      setProgrammerProjects(res as any[]);
-    });
-    getAllMyCustomerProjects(authId).then((res) => {
-      setCustomerProjects(res as any[]);
-    });
-
     const fetchData = async () => {
       const session = await supabase.auth.getSession();
       setAuthId(session.data.session?.user.id || "");
+      getAllMyProgrammerProjects(authId).then((res) => {
+        setProgrammerProjects(res as any[]);
+      });
+      getAllMyCustomerProjects(authId).then((res) => {
+        setCustomerProjects(res as any[]);
+      });
     };
 
     fetchData();
@@ -62,6 +72,7 @@ function Projects() {
                       <TableHead>Programmer</TableHead>
                       <TableHead>Customer</TableHead>
                       <TableHead>Created at</TableHead>
+                      <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -107,6 +118,7 @@ function ProjectRow({ userAuthId, projectData }: projectsProps) {
   const [programmerName, setProgrammerName] = useState<string>("");
   const [customerName, setCustomerName] = useState<string>("");
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     getNameById(projectData.programmer).then((res) => {
@@ -117,19 +129,46 @@ function ProjectRow({ userAuthId, projectData }: projectsProps) {
     });
   });
 
+  const deleteThisProject = async (projectId: number) => {
+    deleteProject(projectId).then(() => {
+      toast({
+        title: "Project deleted",
+        description: "The project was successfully deleted",
+      });
+      router.replace("/dashboard/projects");
+    });
+  };
+
   return (
-    <TableRow
-      key={projectData.id}
-      className="cursor-pointer"
-      onClick={() =>
-        router.replace("/dashboard/project/" + projectData.project_url)
-      }
-    >
+    <TableRow key={projectData.id}>
       <TableCell>{projectData.project_name}</TableCell>
       <TableCell>{programmerName}</TableCell>
       <TableCell>{customerName}</TableCell>
       <TableCell>
         {new Date(projectData.created_at).toLocaleDateString("en-GB")}
+      </TableCell>
+      <TableCell>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button aria-haspopup="true" size="icon" variant="ghost">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() =>
+                router.replace("/dashboard/project/" + projectData.project_url)
+              }
+            >
+              Open
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => deleteProject(projectData.id)}>
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </TableCell>
     </TableRow>
   );

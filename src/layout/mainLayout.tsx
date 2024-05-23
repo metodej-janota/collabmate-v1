@@ -22,9 +22,9 @@ export default function MainLayout({
             session?.user.email || "",
             session?.user.user_metadata.full_name || ""
           );
+          data.subscription.unsubscribe();
         }
       });
-      data.subscription.unsubscribe();
     }
   });
 

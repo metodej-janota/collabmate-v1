@@ -17,4 +17,76 @@ const getThisProject = async (project_url: string) => {
   return data[0];
 };
 
-export { getThisProject };
+const createProject = async (
+  name: string,
+  programmer: string,
+  customer: string
+) => {
+  const { data, error } = await supabase.from("projects").insert({
+    project_name: name,
+    programmer: programmer,
+    customer: customer,
+    project_url:
+      name
+        .replace(/\s/g, "-")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") +
+      "-" +
+      (Math.random() * 1000000).toFixed(0),
+    created_at: new Date(),
+    project_props: {
+      sites: [],
+    },
+  });
+
+  if (error) {
+    return error;
+  }
+};
+
+const getAllMyProgrammerProjects = async (userId: string) => {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("programmer", userId);
+
+  if (error) {
+    console.error(error.message);
+  }
+
+  return data;
+};
+
+const getAllMyCustomerProjects = async (userId: string) => {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("customer", userId);
+
+  if (error) {
+    console.error(error.message);
+  }
+
+  return data;
+};
+
+const deleteProject = async (projectId: number) => {
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", projectId);
+
+  if (error) {
+    console.error(error.message);
+    return error;
+  }
+};
+
+export {
+  createProject,
+  deleteProject,
+  getAllMyCustomerProjects,
+  getAllMyProgrammerProjects,
+  getThisProject,
+};

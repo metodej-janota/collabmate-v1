@@ -24,7 +24,8 @@ import {
 } from "@/components/ui/table";
 import { allFriends } from "@/supabase/lib/friendshipLogic";
 import { useToast } from "../../components/ui/use-toast";
-import { createProject, getNameById } from "../../supabase/lib/databaseLogic";
+import { getNameById } from "../../supabase/lib/databaseLogic";
+import { createProject } from "../../supabase/lib/projectLogic";
 import { getUserAvatar } from "../../supabase/lib/userLogic";
 
 function CreateProject() {
