@@ -29,14 +29,14 @@ const Message = ({ authId, name, message }: MessageProps) => {
 
   if (name == "You") {
     return (
-      <div className="p-1 flex gap-1 bg-orange-100 rounded-md">
+      <div className="p-1 flex gap-1 rounded-md">
         {avatar && (
           <Avatar className="aspect-square rounded-full object-cover w-10 h-10">
             <AvatarImage src={avatar} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         )}
-        <p className="my-auto font-semibold">{newName}:</p>
+        <p className="my-auto font-semibold text-primary">{newName}:</p>
         <p className="my-auto"> {message}</p>
       </div>
     );
