@@ -7,6 +7,7 @@ import Message from "../../components/projectCompo/message";
 import { supabase } from "../../supabase/supabase";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { useToast } from "../ui/use-toast";
 
 interface Message {
   id: string;
@@ -28,6 +29,7 @@ const Chat = ({
     getMessages(project_id)
   );
 
+  const { toast } = useToast();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -57,6 +59,29 @@ const Chat = ({
     e.preventDefault();
     setLoading(true);
 
+    if (!message) {
+      setLoading(false);
+      toast({
+        title: "error",
+        description: "Message cannot be empty",
+      });
+      return;
+    } else if (message.length > 1000) {
+      toast({
+        title: "error",
+        description: "Message cannot be longer than 1000 characters",
+      });
+      setLoading(false);
+      return;
+    } else if (message.length < 1) {
+      toast({
+        title: "error",
+        description: "Message cannot be empty",
+      });
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.from("messages").insert([
       {
         project_id: project_id,
@@ -81,20 +106,25 @@ const Chat = ({
   return (
     <div className="mt-2 flex flex-col gap-2">
       {messages ? (
-        <ScrollArea className="h-[100%] rounded-md border">
-          {messages.map((message: Message) => (
-            <Message
-              key={message.id}
-              name={message.sender === userAuthId ? "You" : message.sender}
-              authId={message.sender}
-              message={message.content}
-            />
-          ))}
+        <ScrollArea className="h-[700px]">
+          <div className="flex flex-col gap-1">
+            {messages.map((message: Message) => (
+              <Message
+                key={message.id}
+                name={message.sender === userAuthId ? "You" : message.sender}
+                authId={message.sender}
+                message={message.content}
+              />
+            ))}
+          </div>
         </ScrollArea>
       ) : (
         <p>Loading...</p>
       )}
-      <form className="flex gap-2" onSubmit={sendMessage}>
+      <form
+        className="flex flex-col gap-2 md:flex-row w-full"
+        onSubmit={sendMessage}
+      >
         <Input
           type="text"
           value={message}
