@@ -1,5 +1,6 @@
 "use client";
 
+import Chat from "@/components/projectCompo/chat";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import {
@@ -14,18 +15,17 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import { getNameById } from "@/supabase/lib/databaseLogic";
 import { getThisProject } from "@/supabase/lib/projectLogic";
@@ -35,7 +35,11 @@ import { Laptop, Smartphone, Tablet } from "lucide-react";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { useEffect, useState } from "react";
+/*
+dodelat chat
+host
 
+*/
 const Project = ({
   project,
 }: {
@@ -106,6 +110,7 @@ const Project = ({
   const [newPageUrl, setNewPageUrl] = useState<string>("");
   const [deleteConfirmation, setDeleteConfirmation] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [projectPropsStorage, setProjectPropsStorage] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,6 +121,15 @@ const Project = ({
       setCustomerName(customerName);
       const programmerName = await getNameById(project.programmer);
       setProgrammerName(programmerName);
+
+      let storage = 0;
+      project.project_props.sites.forEach((site) => {
+        storage += site.props.full.length;
+        storage += site.props.tablet.length;
+        storage += site.props.mobile.length;
+      });
+
+      setProjectPropsStorage(storage);
     };
     fetchData();
   }, [project]);
@@ -156,6 +170,15 @@ const Project = ({
         site.props.full.push(prop);
       }
 
+      if (projectPropsStorage == 100) {
+        toast({
+          title: "Storage full",
+          description: "You have reached the maximum storage capacity",
+        });
+        return prev;
+      }
+
+      setProjectPropsStorage((prev) => prev + 1);
       return newFullJSON;
     });
   };
@@ -257,6 +280,17 @@ const Project = ({
     setActiveSiteUrl("");
     setModalOpen(false);
     await handleSaveChanges();
+    storageHandler();
+  };
+
+  const storageHandler = () => {
+    let storage = 0;
+    fullJSON?.sites.forEach((site) => {
+      storage += site.props.full.length;
+      storage += site.props.tablet.length;
+      storage += site.props.mobile.length;
+    });
+    setProjectPropsStorage(storage);
   };
 
   const handleDeleteAllProps = () => {
@@ -266,6 +300,22 @@ const Project = ({
       const newFullJSON = JSON.parse(JSON.stringify(prev));
       const site = newFullJSON.sites[indexOfSite];
 
+      if (activeSiteUrl === "") {
+        toast({
+          title: "No site selected",
+          description: "You have to select a site to delete all props",
+        });
+        return newFullJSON;
+      }
+
+      if (
+        site.props.mobile.length === 0 &&
+        site.props.tablet.length === 0 &&
+        site.props.full.length === 0
+      ) {
+        return newFullJSON;
+      }
+
       if (resolution === mobile) {
         site.props.mobile = [];
       } else if (resolution === tablet) {
@@ -273,7 +323,6 @@ const Project = ({
       } else {
         site.props.full = [];
       }
-
       return newFullJSON;
     });
 
@@ -281,6 +330,7 @@ const Project = ({
       title: "All props deleted",
       description: "You have successfully deleted all props",
     });
+    storageHandler();
   };
 
   if (router.isFallback) {
@@ -293,24 +343,30 @@ const Project = ({
         <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-2 md:pl-20 md:pt-20">
           <div className="grid grid-cols-6 grid-rows-6 gap-4">
             <Card className="col-span-3 row-span-3">
-              <CardContent>
+              <CardContent className="flex flex-col gap-4">
                 <CardTitle className="text-4xl font-bold mt-4">
                   {project.project_name}
                 </CardTitle>
-                <p className="mt-2">
-                  Project created at:{" "}
-                  <span className="text-orange-500">
-                    {new Date(project.created_at).toLocaleDateString("en-GB")}
-                  </span>
-                </p>
-                <p>
-                  Programmer:{" "}
-                  <span className="text-orange-500">{programmerName}</span>
-                </p>
-                <p>
-                  Customer:{" "}
-                  <span className="text-orange-500">{customerName}</span>
-                </p>
+                <div className="flex flex-col">
+                  <p>
+                    Project created at:{" "}
+                    <span className="text-orange-500">
+                      {new Date(project.created_at).toLocaleDateString("en-GB")}
+                    </span>
+                  </p>
+                  <p>
+                    Programmer:{" "}
+                    <span className="text-orange-500">{programmerName}</span>
+                  </p>
+                  <p>
+                    Customer:{" "}
+                    <span className="text-orange-500">{customerName}</span>
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <p>Project storage:</p>
+                  <Progress value={projectPropsStorage} />
+                </div>
               </CardContent>
             </Card>
             <Card className="col-span-3 row-span-6 col-start-4">
@@ -318,6 +374,7 @@ const Project = ({
                 <CardTitle className="text-4xl font-bold mt-4">
                   Project chat
                 </CardTitle>
+                <Chat project_id={project.id} userAuthId={authId} />
               </CardContent>
             </Card>
             <Card className="col-span-3 row-span-3 row-start-4">

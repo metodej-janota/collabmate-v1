@@ -83,10 +83,25 @@ const deleteProject = async (projectId: number) => {
   }
 };
 
+const getMessages = async (projectId: string) => {
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error(error.message);
+  }
+
+  return data;
+};
+
 export {
   createProject,
   deleteProject,
   getAllMyCustomerProjects,
   getAllMyProgrammerProjects,
+  getMessages,
   getThisProject,
 };
