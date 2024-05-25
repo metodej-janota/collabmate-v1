@@ -1,3 +1,4 @@
+import NextCrypto from "next-crypto";
 import { useEffect, useState } from "react";
 import { getNameById } from "../../supabase/lib/databaseLogic";
 import { getUserAvatar } from "../../supabase/lib/userLogic";
@@ -12,7 +13,8 @@ type MessageProps = {
 const Message = ({ authId, name, message }: MessageProps) => {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [newName, setNewName] = useState<string>(name);
-
+  const [newMessage, setNewMessage] = useState<string>(message);
+  const crypto = new NextCrypto(process.env.CRYPTO_SECRET as string);
   useEffect(() => {
     const fetchData = async () => {
       if (name !== "You") {

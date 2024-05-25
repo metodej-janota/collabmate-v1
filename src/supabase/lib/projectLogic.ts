@@ -94,7 +94,7 @@ const getMessages = async (projectId: string) => {
     console.error(error.message);
   }
 
-  return data;
+  return data || [];
 };
 
 export {

@@ -1,5 +1,6 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getMessages } from "@/supabase/lib/projectLogic";
+import NextCrypto from "next-crypto";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR, { mutate } from "swr";
@@ -9,7 +10,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useToast } from "../ui/use-toast";
 
-interface Message {
+interface MessageData {
   id: string;
   project_id: string;
   sender: string;
@@ -24,6 +25,7 @@ const Chat = ({
   project_id: string;
   userAuthId: string;
 }) => {
+  const crypto = new NextCrypto(process.env.CRYPTO_SECRET as string);
   const router = useRouter();
   const { data: messages, error } = useSWR(project_id, () =>
     getMessages(project_id)
@@ -32,6 +34,22 @@ const Chat = ({
   const { toast } = useToast();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [decryptedMessages, setDecryptedMessages] = useState<MessageData[]>([]);
+
+  useEffect(() => {
+    if (messages) {
+      const decryptMessages = async () => {
+        const decrypted = await Promise.all(
+          messages.map(async (message: MessageData) => ({
+            ...message,
+            content: (await crypto.decrypt(message.content)) || "", // Convert null to empty string
+          }))
+        );
+        setDecryptedMessages(decrypted);
+      };
+      decryptMessages();
+    }
+  }, [messages, crypto]);
 
   useEffect(() => {
     const channel = supabase
@@ -86,7 +104,7 @@ const Chat = ({
       {
         project_id: project_id,
         sender: userAuthId,
-        content: message,
+        content: await crypto.encrypt(message),
       },
     ]);
 
@@ -105,10 +123,10 @@ const Chat = ({
 
   return (
     <div className="mt-2 flex flex-col gap-2">
-      {messages ? (
+      {decryptedMessages.length > 0 ? (
         <ScrollArea className="h-[700px]">
           <div className="flex flex-col gap-1">
-            {messages.map((message: Message) => (
+            {decryptedMessages.map((message: MessageData) => (
               <Message
                 key={message.id}
                 name={message.sender === userAuthId ? "You" : message.sender}
