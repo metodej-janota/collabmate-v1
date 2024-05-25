@@ -42,7 +42,7 @@ const Chat = ({
         const decrypted = await Promise.all(
           messages.map(async (message: MessageData) => ({
             ...message,
-            content: (await crypto.decrypt(message.content)) || "", // Convert null to empty string
+            content: (await crypto.decrypt(message.content)) || "",
           }))
         );
         setDecryptedMessages(decrypted);
