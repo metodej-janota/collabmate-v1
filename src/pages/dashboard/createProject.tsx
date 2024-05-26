@@ -88,7 +88,7 @@ function CreateProject() {
               <CardHeader>
                 <CardTitle>Create new project!</CardTitle>
                 <CardDescription>
-                  Manage your products and view their sales performance.
+                  Create a new project and invite your friends!
                 </CardDescription>
               </CardHeader>
               <CardContent>
