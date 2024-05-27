@@ -25,7 +25,9 @@ const Chat = ({
   project_id: string;
   userAuthId: string;
 }) => {
-  const crypto = new NextCrypto(process.env.CRYPTO_SECRET as string);
+  const crypto = new NextCrypto(
+    process.env.NEXT_PUBLIC_CRYPTO_SECRET as string
+  );
   const router = useRouter();
   const { data: messages, error } = useSWR(project_id, () =>
     getMessages(project_id)
